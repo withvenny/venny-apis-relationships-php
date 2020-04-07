@@ -614,7 +614,7 @@
             if(isset($request['attributes'])){$columns.="tag_attributes,";}
             if(isset($request['label'])){$columns.="tag_label,";}
             if(isset($request['object'])){$columns.="tag_object,";}
-            if(isset($request['profile'])){$columns.="profile,";}
+            if(isset($request['profile'])){$columns.="profile_id,";}
 
             $columns.= "app_id,";
             $columns.= "event_id,";
