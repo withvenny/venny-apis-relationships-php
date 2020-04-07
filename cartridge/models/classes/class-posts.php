@@ -66,7 +66,7 @@
     }
 
     //
-    class Tokend {
+    class Token {
 
         /**
          * PDO object
