@@ -511,13 +511,14 @@
             $set = "";
 
             // UPDATE OBJECT - SET
-            //if(isset($request['id'])){$set.= " thread_id = :thread_id ";}
-            if(isset($request['attributes'])){$set.= " thread_attributes = :thread_attributes ";}
-            if(isset($request['title'])){$set.= " thread_title = :thread_title ";}
-            if(isset($request['participants'])){$set.= " thread_participants = :thread_participants ";}
-            if(isset($request['preview'])){$set.= " thread_preview = :thread_preview ";}
-            //if(isset($request['profile'])){$set.= " profile_id = :profile_id ";}
-
+            // SKIP as ID won't be getting UPDATED
+            //if(isset($request['attributes'])){$set.= " post_attributes = :post_attributes ";}
+            if(isset($request['body'])){$set.= " post_body = :post_body ";}
+            if(isset($request['images'])){$set.= " post_images = :post_images ";}
+            if(isset($request['closed'])){$set.= " post_closed = :post_closed ";}
+            if(isset($request['deleted'])){$set.= " post_deleted = :post_deleted ";}
+            if(isset($request['access'])){$set.= " post_access = :post_access ";}
+            //if(isset($request['host'])){$set.= " post_host = :post_host ";}
             //
             $set = str_replace('  ',',',$set);
 
@@ -536,13 +537,16 @@
             $statement = $this->pdo->prepare($sql);
     
             // UPDATE OBJECT - BIND VALUES
-            //if(isset($request['id'])){$statement->bindValue(':thread_id', $request['id']);}
-            if(isset($request['attributes'])){$statement->bindValue(':thread_attributes', $request['attributes']);}
-            if(isset($request['title'])){$statement->bindValue(':thread_title', $request['title']);}
-            if(isset($request['participants'])){$statement->bindValue(':thread_participants', $request['participants']);}
-            if(isset($request['preview'])){$statement->bindValue(':thread_preview', $request['preview']);}
-            //if(isset($request['profile'])){$statement->bindValue(':profile_id', $request['profile']);}
-            //if(isset($request['app'])){$statement->bindValue(':app_id', $request['app']);}
+            //if(isset($request['id'])){$statement->bindValue(':post_id', $request['id']);}
+            //if(isset($request['attributes'])){$statement->bindValue(':post_attributes', $request['attributes']);}
+            if(isset($request['body'])){$statement->bindValue(':post_body', $request['body']);}
+            if(isset($request['images'])){$statement->bindValue(':post_images', $request['images']);}
+            if(isset($request['closed'])){$statement->bindValue(':post_closed', $request['closed']);}
+            if(isset($request['deleted'])){$statement->bindValue(':post_deleted', $request['deleted']);}
+            if(isset($request['access'])){$statement->bindValue(':post_access', $request['access']);}
+            //if(isset($request['host'])){$statement->bindValue(':post_host', $request['host']);}
+            //if(isset($request['profile_id'])){$statement->bindValue(':profile_id', $request['profile_id']);}
+            //if(isset($request['app_id'])){$statement->bindValue(':app_id', $request['app_id']);}
 
             $statement->bindValue(':id', $id);
 
@@ -551,7 +555,7 @@
 
             $data = $statement->fetchAll();
             
-            $data = $data[0]['thread_id'];
+            $data = $data[0]['post_id'];
 
             // return generated id
             return $data;
