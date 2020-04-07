@@ -219,7 +219,7 @@
             $this->pdo = $pdo;
 
             //
-            $this->token = new \Posts\Token($this->pdo);
+            $this->token = new \Reactions\Token($this->pdo);
 
         }
 
