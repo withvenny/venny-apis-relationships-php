@@ -4,9 +4,9 @@
     header('Content-Type: application/json');
 
     //
-    use Posts\Connection as Connection;
-    use Posts\Token as Token;
-    use Posts\Post as Post;
+    use Reactions\Connection as Connection;
+    use Reactions\Token as Token;
+    use Reactions\Acknowledgement as Acknowledgement;
 
     // connect to the PostgreSQL database
     $pdo = Connection::get()->connect();
@@ -32,14 +32,14 @@
             try {
 
                 // 
-                $acknowledgment = new Acknowledgment($pdo);
+                $acknowledgement = new Acknowledgement($pdo);
             
                 // insert a stock into the stocks table
-                $id = $acknowledgment->insertAcknowledgment($request);
+                $id = $acknowledgement->insertAcknowledgement($request);
 
                 $request['id'] = $id;
 
-                $results = $acknowledgment->selectAcknowledgments($request);
+                $results = $acknowledgement->selectAcknowledgements($request);
 
                 $results = json_encode($results);
                 
@@ -65,10 +65,10 @@
             try {
 
                 // 
-                $acknowledgment = new Acknowledgment($pdo);
+                $acknowledgement = new Acknowledgement($pdo);
 
                 // get all stocks data
-                $results = $acknowledgment->selectAcknowledgments($request);
+                $results = $acknowledgement->selectAcknowledgements($request);
 
                 $results = json_encode($results);
 
@@ -88,14 +88,14 @@
             try {
 
                 // 
-                $acknowledgment = new Acknowledgment($pdo);
+                $acknowledgement = new Acknowledgement($pdo);
             
                 // insert a stock into the stocks table
-                $id = $acknowledgment->updateAcknowledgment($request);
+                $id = $acknowledgement->updateAcknowledgement($request);
 
                 $request['id'] = $id;
 
-                $results = $acknowledgment->selectAcknowledgments($request);
+                $results = $acknowledgement->selectAcknowledgements($request);
 
                 $results = json_encode($results);
 
@@ -115,10 +115,10 @@
             try {
 
                 // 
-                $acknowledgment = new Acknowledgment($pdo);
+                $acknowledgement = new Acknowledgement($pdo);
             
                 // insert a stock into the stocks table
-                $id = $acknowledgment->deleteAcknowledgment($request);
+                $id = $acknowledgement->deleteAcknowledgement($request);
 
                 echo 'The record ' . $id . ' has been deleted';
             

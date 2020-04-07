@@ -227,7 +227,7 @@
         public function insertAcknowledgement($request) {
 
             //generate ID
-            if(!isset($request['id'])){$request['id'] = $this->token->new_id('pst');}
+            if(!isset($request['id'])){$request['id'] = $this->token->new_id('ack');}
 
             $columns = "";
 
