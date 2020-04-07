@@ -527,7 +527,7 @@
 
             $data = $statement->fetchAll();
             
-            $data = $data[0]['post_id'];
+            $data = $data[0]['acknowledgement_id'];
 
             // return generated id
             return $data;
