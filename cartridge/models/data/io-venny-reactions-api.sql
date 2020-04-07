@@ -40,13 +40,13 @@ time_updated	TIMESTAMPTZ	NOT NULL DEFAULT NOW(),
 time_finished	TIMESTAMPTZ	NOT NULL DEFAULT NOW(),
 active	INT	NOT NULL DEFAULT 1
 );
-CREATE SEQUENCE comments_sequence;	
+CREATE SEQUENCE comments_sequence;
 ALTER SEQUENCE comments_sequence RESTART WITH 8301;
 ALTER TABLE comments ALTER COLUMN ID SET DEFAULT nextval('comments_sequence');
 -- ALTER TABLE comments ADD FOREIGN KEY (profile_ID) REFERENCES profiles(profile_ID);
 -- ALTER TABLE comments ADD FOREIGN KEY (app_ID) REFERENCES apps(app_ID);		
-SELECT * FROM comments;		
-DROP TABLE comments;		
+SELECT * FROM comments;
+DROP TABLE comments;
 INSERT INTO comments (comment_ID,comment_attributes,comment_text,comment_thread,comment_object,profile_ID,app_ID,event_ID,process_ID)		
  VALUES ('30-characters','{}','lorem ipsum','30 characters','30 characters','30 characters','30 characters','30 characters','30 characters');		
 SELECT * FROM comments;
