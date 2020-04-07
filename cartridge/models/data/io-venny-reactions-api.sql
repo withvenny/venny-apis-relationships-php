@@ -49,4 +49,5 @@ SELECT * FROM comments;
 DROP TABLE comments;		
 INSERT INTO comments (comment_ID,comment_attributes,comment_text,comment_thread,comment_object,profile_ID,app_ID,event_ID,process_ID)		
  VALUES ('30-characters','{}','lorem ipsum','30 characters','30 characters','30 characters','30 characters','30 characters','30 characters');		
-SELECT * FROM comments;	
+SELECT * FROM comments;
+SELECT * FROM comments;

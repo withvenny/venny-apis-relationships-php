@@ -673,7 +673,7 @@
                 comment_thread,
                 comment_object,
                 profile_ID,
-                app_ID,
+                app_ID
 
                 ";
 
