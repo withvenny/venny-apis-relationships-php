@@ -17,12 +17,14 @@
     if(isset($_REQUEST['token'])){$request['token'] = clean($_REQUEST['token']);}
 
     // INITIATE DATA CLEANSE
-    if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}		
-    if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}		
-    if(isset($_REQUEST['body'])){$request['body'] = clean($_REQUEST['body']);}		
-    if(isset($_REQUEST['images'])){$request['images'] = clean($_REQUEST['images']);}		
+    if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}
+    if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}
+    if(isset($_REQUEST['body'])){$request['body'] = clean($_REQUEST['body']);}
+    if(isset($_REQUEST['images'])){$request['images'] = clean($_REQUEST['images']);}
+    if(isset($_REQUEST['closed'])){$request['closed'] = clean($_REQUEST['closed']);}
     if(isset($_REQUEST['deleted'])){$request['deleted'] = clean($_REQUEST['deleted']);}
-    if(isset($_REQUEST['thread'])){$request['thread'] = clean($_REQUEST['thread']);}
+    if(isset($_REQUEST['access'])){$request['access'] = clean($_REQUEST['access']);}
+    if(isset($_REQUEST['host'])){$request['host'] = clean($_REQUEST['host']);}
     if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
 
     //
@@ -34,14 +36,14 @@
             try {
 
                 // 
-                $message = new Message($pdo);
+                $post = new Post($pdo);
             
                 // insert a stock into the stocks table
-                $id = $message->insertMessage($request);
+                $id = $post->insertPost($request);
 
                 $request['id'] = $id;
 
-                $results = $message->selectMessages($request);
+                $results = $post->selectPosts($request);
 
                 $results = json_encode($results);
                 
@@ -67,10 +69,10 @@
             try {
 
                 // 
-                $message = new Message($pdo);
+                $post = new Post($pdo);
 
                 // get all stocks data
-                $results = $message->selectMessages($request);
+                $results = $post->selectPosts($request);
 
                 $results = json_encode($results);
 
@@ -90,14 +92,14 @@
             try {
 
                 // 
-                $message = new Message($pdo);
+                $post = new Post($pdo);
             
                 // insert a stock into the stocks table
-                $id = $message->updateMessage($request);
+                $id = $post->updatePost($request);
 
                 $request['id'] = $id;
 
-                $results = $message->selectMessages($request);
+                $results = $post->selectPosts($request);
 
                 $results = json_encode($results);
 
@@ -117,10 +119,10 @@
             try {
 
                 // 
-                $message = new Message($pdo);
+                $post = new Post($pdo);
             
                 // insert a stock into the stocks table
-                $id = $message->deleteMessage($request);
+                $id = $post->deletePost($request);
 
                 echo 'The record ' . $id . ' has been deleted';
             

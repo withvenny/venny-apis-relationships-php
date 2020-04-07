@@ -227,17 +227,20 @@
         public function insertPost($request) {
 
             //generate ID
-            if(!isset($request['id'])){$request['id'] = $this->token->new_id('thr');}
+            if(!isset($request['id'])){$request['id'] = $this->token->new_id('pst');}
 
             $columns = "";
 
             // INSERT OBJECT - COLUMNS
-            if(isset($request['id'])){$columns.="thread_id,";}
-            if(isset($request['attributes'])){$columns.="thread_attributes,";}
-            if(isset($request['title'])){$columns.="thread_title,";}
-            if(isset($request['participants'])){$columns.="thread_participants,";}
-            if(isset($request['preview'])){$columns.="thread_preview,";}
-            if(isset($request['profile'])){$columns.="profile_id,";}
+            if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}
+            if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}
+            if(isset($_REQUEST['body'])){$request['body'] = clean($_REQUEST['body']);}
+            if(isset($_REQUEST['images'])){$request['images'] = clean($_REQUEST['images']);}
+            if(isset($_REQUEST['closed'])){$request['closed'] = clean($_REQUEST['closed']);}
+            if(isset($_REQUEST['deleted'])){$request['deleted'] = clean($_REQUEST['deleted']);}
+            if(isset($_REQUEST['access'])){$request['access'] = clean($_REQUEST['access']);}
+            if(isset($_REQUEST['host'])){$request['host'] = clean($_REQUEST['host']);}
+            if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
 
             $columns.= "app_id,";
             $columns.= "event_id,";
@@ -246,11 +249,14 @@
             $values = "";
 
             // INSERT OBJECT - VALUES
-            if(isset($request['id'])){$values.=":thread_id,";}
-            if(isset($request['attributes'])){$values.=":thread_attributes,";}
-            if(isset($request['title'])){$values.=":thread_title,";}
-            if(isset($request['participants'])){$values.=":thread_participants,";}
-            if(isset($request['preview'])){$values.=":thread_preview,";}
+            if(isset($request['id'])){$values.=":post_id,";}
+            if(isset($request['attributes'])){$values.=":post_attributes,";}
+            if(isset($request['body'])){$values.=":post_body,";}
+            if(isset($request['images'])){$values.=":post_images,";}
+            if(isset($request['closed'])){$values.=":post_closed,";}
+            if(isset($request['deleted'])){$values.=":post_deleted,";}
+            if(isset($request['access'])){$values.=":post_access,";}
+            if(isset($request['host'])){$values.=":post_host,";}
             if(isset($request['profile'])){$values.=":profile_id,";}
 
             $values.= ":app_id,";
@@ -269,13 +275,16 @@
             $statement = $this->pdo->prepare($sql);
             
             // INSERT OBJECT - BIND VALUES
-            if(isset($request['id'])){$statement->bindValue('thread_id',$request['id']);}
-            if(isset($request['attributes'])){$statement->bindValue('thread_attributes',$request['attributes']);}
-            if(isset($request['title'])){$statement->bindValue('thread_title',$request['title']);}
-            if(isset($request['participants'])){$statement->bindValue('thread_participants',$request['participants']);}
-            if(isset($request['preview'])){$statement->bindValue('thread_preview',$request['preview']);}
+            if(isset($request['id'])){$statement->bindValue('post_id',$request['id']);}
+            if(isset($request['attributes'])){$statement->bindValue('post_attributes',$request['attributes']);}
+            if(isset($request['body'])){$statement->bindValue('post_body',$request['body']);}
+            if(isset($request['images'])){$statement->bindValue('post_images',$request['images']);}
+            if(isset($request['closed'])){$statement->bindValue('post_closed',$request['closed']);}
+            if(isset($request['deleted'])){$statement->bindValue('post_deleted',$request['deleted']);}
+            if(isset($request['access'])){$statement->bindValue('post_access',$request['access']);}
+            if(isset($request['host'])){$statement->bindValue('post_host',$request['host']);}
             if(isset($request['profile'])){$statement->bindValue('profile_id',$request['profile']);}
-
+ 
             $statement->bindValue(':app_id', $request['app']);
             $statement->bindValue(':event_id', $this->token->event_id());
             $statement->bindValue(':process_id', $this->token->process_id());
@@ -285,7 +294,7 @@
 
             $data = $statement->fetchAll();
             
-            $data = $data[0]['thread_id'];
+            $data = $data[0]['post_id'];
 
             return $data;
         
@@ -315,12 +324,16 @@
                 // SELECT OBJECT - COLUMNS
                 $columns = "
 
-                    thread_ID,
-                    thread_attributes,
-                    thread_title,
-                    thread_participants,
-                    thread_preview,
-                    profile_ID
+                post_ID,		
+                post_attributes,		
+                post_body,		
+                post_images,		
+                post_closed,		
+                post_deleted,		
+                post_access,		
+                post_host,
+                profile_ID,
+                app_ID
 
                 ";
 
@@ -371,11 +384,12 @@
                     $refinements = "";
 
                     // SELECT OBJECT - WHERE CLAUSES
-                    // SKIP ID
-                    if(isset($request['attributes'])){$refinements.="thread_attributes"." ILIKE "."'%".$request['attributes']."%' AND ";}
-                    if(isset($request['title'])){$refinements.="thread_title"." ILIKE "."'%".$request['title']."%' AND ";}
-                    if(isset($request['participants'])){$refinements.="thread_participants"." ILIKE "."'%".$request['participants']."%' AND ";}
-                    if(isset($request['preview'])){$refinements.="thread_preview"." ILIKE "."'%".$request['preview']."%' AND ";}
+                    // SKIP ID		
+                    if(isset($request['body'])){$refinements.="post_body"." ILIKE "."'%".$request['body']."%' AND ";}		
+                    if(isset($request['closed'])){$refinements.="post_closed"." = "."'".$request['closed']."' AND ";}		
+                    if(isset($request['deleted'])){$refinements.="post_deleted"." = "."'".$request['deleted']."' AND ";}		
+                    if(isset($request['access'])){$refinements.="post_access"." = "."'".$request['access']."' AND ";}		
+                    if(isset($request['host'])){$refinements.="post_host"." = "."'".$request['host']."' AND ";}		
 
                     //echo $conditions . 'conditions1<br/>';
                     //echo $refinements . 'refinements1<br/>';
@@ -426,12 +440,15 @@
                         //
                         $data[] = [
 
-                            'id' => $row['thread_id'],
-                            'attributes' => json_decode($row['thread_attributes']),
-                            'title' => $row['thread_title'],
-                            'participants' => json_decode($row['thread_participants']),
-                            'preview' => $row['thread_preview'],
-                            'profile_id' => $row['profile_id'],
+                            'id' => $row['post_id'],
+                            'attributes' => json_decode($row['post_attributes']),
+                            'body' => $row['post_body'],
+                            'images' => json_decode($row['post_images']),
+                            'closed' => $row['post_closed'],
+                            'deleted' => $row['post_deleted'],
+                            'access' => $row['post_access'],
+                            'host' => $row['post_host'],
+                            'profile' => $row['profile_id']
 
                         ];
 
