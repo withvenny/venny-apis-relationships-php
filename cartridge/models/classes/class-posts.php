@@ -896,8 +896,8 @@
             if(isset($request['attributes'])){$statement->bindValue(':tag_attributes', $request['attributes']);}
             if(isset($request['label'])){$statement->bindValue(':tag_label', $request['label']);}
             if(isset($request['object'])){$statement->bindValue(':tag_object', $request['object']);}
-            if(isset($request['profile'])){$statement->bindValue(':profile_id', $request['profile']);}
-            if(isset($request['app'])){$statement->bindValue(':app_id', $request['app']);}
+            //if(isset($request['profile'])){$statement->bindValue(':profile_id', $request['profile']);}
+            //if(isset($request['app'])){$statement->bindValue(':app_id', $request['app']);}
 
             $statement->bindValue(':id', $id);
 
