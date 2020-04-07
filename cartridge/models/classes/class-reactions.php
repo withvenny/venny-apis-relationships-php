@@ -556,4 +556,360 @@
 
     }
     
+    //
+    class Comment {
+
+        //
+        private $pdo;
+    
+        //
+        public function __construct($pdo) {
+
+            //
+            $this->pdo = $pdo;
+
+            //
+            $this->token = new \Reactions\Token($this->pdo);
+
+        }
+
+        //
+        public function insertComment($request) {
+
+            //generate ID
+            if(!isset($request['id'])){$request['id'] = $this->token->new_id('ack');}
+
+            $columns = "";
+
+            // INSERT OBJECT - COLUMNS
+            if(isset($request['id'])){$columns.="comment_id,";}
+            if(isset($request['attributes'])){$columns.="comment_attributes,";}
+            if(isset($request['text'])){$columns.="comment_text,";}
+            if(isset($request['thread'])){$columns.="comment_thread,";}
+            if(isset($request['object'])){$columns.="comment_object,";}
+            if(isset($request['profile'])){$columns.="profile_id,";}
+            
+            $columns.= "app_id,";
+            $columns.= "event_id,";
+            $columns.= "process_id";
+
+            $values = "";
+
+            // INSERT OBJECT - VALUES
+            if(isset($request['id'])){$values.=":comment_id,";}
+            if(isset($request['attributes'])){$values.=":comment_attributes,";}
+            if(isset($request['text'])){$values.=":comment_text,";}
+            if(isset($request['thread'])){$values.=":comment_thread,";}
+            if(isset($request['object'])){$values.=":comment_object,";}
+            if(isset($request['profile'])){$values.=":profile_id,";}
+            
+            $values.= ":app_id,";
+            $values.= ":event_id,";
+            $values.= ":process_id";
+
+            // prepare statement for insert
+            $sql = "INSERT INTO {$request['domain']} (";
+            $sql.= $columns;
+            $sql.= ") VALUES (";
+            $sql.= $values;
+            $sql.= ")";
+            $sql.= " RETURNING " . prefixed($request['domain']) . "_id";
+
+            //echo $sql;
+    
+            //
+            $statement = $this->pdo->prepare($sql);
+            
+            // INSERT OBJECT - BIND VALUES
+            if(isset($request['id'])){$statement->bindValue('comment_id',$request['id']);}
+            if(isset($request['attributes'])){$statement->bindValue('comment_attributes',$request['attributes']);}
+            if(isset($request['text'])){$statement->bindValue('comment_text',$request['text']);}
+            if(isset($request['thread'])){$statement->bindValue('comment_thread',$request['thread']);}
+            if(isset($request['object'])){$statement->bindValue('comment_object',$request['object']);}
+            if(isset($request['profile'])){$statement->bindValue('profile_id',$request['profile']);}
+             
+            $statement->bindValue(':app_id', $request['app']);
+            $statement->bindValue(':event_id', $this->token->event_id());
+            $statement->bindValue(':process_id', $this->token->process_id());
+            
+            // execute the insert statement
+            $statement->execute();
+
+            $data = $statement->fetchAll();
+            
+            $data = $data[0]['comment_id'];
+
+            return $data;
+        
+        }
+
+        //
+        public function selectComments($request) {
+
+            //echo json_encode($request); exit;
+
+            //$token = new \Core\Token($this->pdo);
+            $token = $this->token->validatedToken($request['token']);
+
+            // Retrieve data ONLY if token  
+            if($token) {
+                
+                // domain, app always present
+                if(!isset($request['per'])){$request['per']=20;}
+                if(!isset($request['page'])){$request['page']=1;}
+                if(!isset($request['limit'])){$request['limit']=100;}
+
+                //
+                $conditions = "";
+                $domain = $request['domain'];
+                $prefix = prefixed($domain);
+
+                // SELECT OBJECT - COLUMNS
+                $columns = "
+
+                comment_ID,
+                comment_attributes,
+                comment_text,
+                comment_thread,
+                comment_object,
+                profile_ID,
+                app_ID,
+
+                ";
+
+                $table = $domain;
+
+                //
+                $start = 0;
+
+                //
+                if(isset($request['page'])) {
+
+                    //
+                    $start = ($request['page'] - 1) * $request['per'];
+                
+                }
+
+                //
+                if(!empty($request['id'])) {
+
+                    $conditions.= ' WHERE ';
+                    $conditions.= ' ' . $prefix . '_id = :id ';
+                    $conditions.= ' AND active = 1 ';
+                    $conditions.= ' ORDER BY time_finished DESC ';
+
+                    $subset = " LIMIT 1";
+
+                    $sql = "SELECT ";
+                    $sql.= $columns;
+                    $sql.= " FROM " . $table;
+                    $sql.= $conditions;
+                    $sql.= $subset;
+                    
+                    //echo json_encode($request['id']);
+                    //echo '<br/>';
+                    //echo $sql; exit;
+
+                    //
+                    $statement = $this->pdo->prepare($sql);
+
+                    // bind value to the :id parameter
+                    $statement->bindValue(':id', $request['id']);
+
+                    //echo $sql; exit;
+
+                } else {
+
+                    $conditions = "";
+                    $refinements = "";
+
+                    // SELECT OBJECT - WHERE CLAUSES
+                    // SKIP ID
+                    //if(isset($request['attributes'])){$refinements.="comment_attributes"." ILIKE "."'%".$request['attributes']."%' AND ";}
+                    if(isset($request['text'])){$refinements.="comment_text"." ILIKE "."'%".$request['text']."%' AND ";}
+                    if(isset($request['thread'])){$refinements.="comment_thread"." = "."'".$request['thread']."' AND ";}
+                    if(isset($request['object'])){$refinements.="comment_object"." = "."'".$request['object']."' AND ";}
+                    if(isset($request['profile'])){$refinements.="profile_id"." = "."'".$request['profile_id']."' AND ";}
+
+                    //echo $conditions . 'conditions1<br/>';
+                    //echo $refinements . 'refinements1<br/>';
+                    
+                    $conditions.= " WHERE ";
+                    $conditions.= $refinements;
+                    $conditions.= " active = 1 ";
+                    $conditions.= ' AND app_id = \'' . $request['app'] . '\' ';
+                    $conditions.= ' AND profile_id = \'' . $request['profile'] . '\' ';
+                    $conditions.= " ORDER BY time_finished DESC ";
+                    $subset = " OFFSET {$start}" . " LIMIT {$request['per']}";
+                    $sql = "SELECT ";
+                    $sql.= $columns;
+                    $sql.= "FROM " . $table;
+                    $sql.= $conditions;
+                    $sql.= $subset;
+
+                    //echo $conditions . 'conditions2<br/>';
+                    //echo $refinements . 'refinements2<br/>';
+
+                    //echo $sql; exit;
+                    
+                    //
+                    $statement = $this->pdo->prepare($sql);
+
+                }
+                    
+                // execute the statement
+                $statement->execute();
+
+                //
+                $results = [];
+                $total = $statement->rowCount();
+                $pages = ceil($total/$request['per']); //
+                //$current = 1; // current page
+                //$limit = $result['limit'];
+                //$max = $result['max'];
+
+                //
+                if($statement->rowCount() > 0) {
+
+                    //
+                    $data = array();
+                
+                    //
+                    while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        
+                        //
+                        $data[] = [
+
+                            'id' => $row['comment_id'],
+                            'attributes' => json_decode($row['comment_attributes']),
+                            'text' => $row['comment_text'],
+                            'thread' => $row['comment_thread'],
+                            'object' => $row['comment_object'],
+                            'profile' => $row['profile_id'],
+                            'app' => $row['app_id'],
+
+                        ];
+
+                    }
+
+                    $code = 200;
+                    $message = "OK";
+
+                } else {
+
+                    //
+                    $data = NULL;
+                    $code = 204;
+                    $message = "No Content";
+
+                }
+
+            } else {
+
+                //
+                $data[] = NULL;
+                $code = 401;
+                $message = "Forbidden - Valid token required";
+
+            }
+
+            $results = array(
+
+                'status' => $code,
+                'message' => $message,
+                'metadata' => [
+                    'page' => $request['page'],
+                    'pages' => $pages,
+                    'total' => $total
+                ],
+                'data' => $data,
+                'log' => [
+                    'process' => $process_id = $this->token->process_id(),
+                    'event' => $event_id = $this->token->event_id($process_id)
+                ]
+
+            );
+
+            //
+            return $results;
+
+        }
+
+        //
+        public function updateComment($request) {
+
+            //
+            $domain = $request['domain'];
+            $table = prefixed($domain);
+            $id = $request['id'];
+
+            //
+            $set = "";
+
+            // UPDATE OBJECT - SET
+            // SKIP as ID won't be getting UPDATED
+            if(isset($request['attributes'])){$set.= " acknowledgement_attributes = :acknowledgement_attributes ";}
+            if(isset($request['type'])){$set.= " acknowledgement_type = :acknowledgement_type ";}
+            if(isset($request['object'])){$set.= " acknowledgement_object = :acknowledgement_object ";}
+
+            //
+            $set = str_replace('  ',',',$set);
+
+            // GET table name
+            $condition = $table."_id = :id";
+            $condition.= " RETURNING " . $table . "_id";
+
+            // sql statement to update a row in the stock table
+            $sql = "UPDATE {$domain} SET ";
+            $sql.= $set;
+            $sql.= " WHERE ";
+            $sql.= $condition;
+
+            //echo $sql; exit;
+
+            $statement = $this->pdo->prepare($sql);
+    
+            // UPDATE OBJECT - BIND VALUES
+            // SKIP as ID won't be getting UPDATED
+            if(isset($request['attributes'])){$set.= " comment_attributes = :comment_attributes ";}
+            if(isset($request['text'])){$set.= " comment_text = :comment_text ";}
+            //if(isset($request['thread'])){$set.= " comment_thread = :comment_thread ";}
+            //if(isset($request['object'])){$set.= " comment_object = :comment_object ";}
+
+            $statement->bindValue(':id', $id);
+
+            // update data in the database
+            $statement->execute();
+
+            $data = $statement->fetchAll();
+            
+            $data = $data[0]['comment_id'];
+
+            // return generated id
+            return $data;
+
+        }
+
+        //
+        public function deleteComment($request) {
+
+            $id = $request['id'];
+            $domain = $request['domain'];
+            $column = prefixed($domain) . '_id';
+            $sql = 'DELETE FROM ' . $domain . ' WHERE '.$column.' = :id';
+            //echo $id; //exit
+            //echo $column; //exit;
+            //echo $domain; //exit;
+            //echo $sql; //exit
+
+            $statement = $this->pdo->prepare($sql);
+            //$statement->bindParam(':column', $column);
+            $statement->bindValue(':id', $id);
+            $statement->execute();
+            return $statement->rowCount();
+
+        }
+
+    }
+    
 ?>
