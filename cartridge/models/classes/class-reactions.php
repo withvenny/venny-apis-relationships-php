@@ -207,7 +207,7 @@
     }
 
     //
-    class Acknowledgements {
+    class Acknowledgement {
 
         //
         private $pdo;
