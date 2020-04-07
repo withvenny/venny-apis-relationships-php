@@ -4,9 +4,9 @@
     header('Content-Type: application/json');
 
     //
-    use Reactions\Connection as Connection;
-    use Reactions\Token as Token;
-    use Reactions\Acknowledgement as Acknowledgement;
+    use Relationships\Connection as Connection;
+    use Relationships\Token as Token;
+    use Relationships\Followship as Followship;
 
     // connect to the PostgreSQL database
     $pdo = Connection::get()->connect();
@@ -19,10 +19,11 @@
     // INITIATE DATA CLEANSE
     if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}
     if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}
-    if(isset($_REQUEST['type'])){$request['type'] = clean($_REQUEST['type']);}
-    if(isset($_REQUEST['object'])){$request['object'] = clean($_REQUEST['object']);}
-    if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
-    
+    if(isset($_REQUEST['recipient'])){$request['recipient'] = clean($_REQUEST['recipient']);}
+    if(isset($_REQUEST['sender'])){$request['sender'] = clean($_REQUEST['sender']);}
+    if(isset($_REQUEST['status'])){$request['status'] = clean($_REQUEST['status']);}
+    if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile_']);}
+
     //
     switch ($_SERVER['REQUEST_METHOD']) {
 
@@ -32,14 +33,14 @@
             try {
 
                 // 
-                $acknowledgement = new Acknowledgement($pdo);
+                $followship = new Followship($pdo);
             
                 // insert a stock into the stocks table
-                $id = $acknowledgement->insertAcknowledgement($request);
+                $id = $followship->insertFollowship($request);
 
                 $request['id'] = $id;
 
-                $results = $acknowledgement->selectAcknowledgements($request);
+                $results = $followship->selectFollowships($request);
 
                 $results = json_encode($results);
                 
@@ -65,10 +66,10 @@
             try {
 
                 // 
-                $acknowledgement = new Acknowledgement($pdo);
+                $followship = new Followship($pdo);
 
                 // get all stocks data
-                $results = $acknowledgement->selectAcknowledgements($request);
+                $results = $followship->selectFollowships($request);
 
                 $results = json_encode($results);
 
@@ -88,14 +89,14 @@
             try {
 
                 // 
-                $acknowledgement = new Acknowledgement($pdo);
+                $followship = new Followship($pdo);
             
                 // insert a stock into the stocks table
-                $id = $acknowledgement->updateAcknowledgement($request);
+                $id = $followship->updateFollowship($request);
 
                 $request['id'] = $id;
 
-                $results = $acknowledgement->selectAcknowledgements($request);
+                $results = $followship->selectFollowships($request);
 
                 $results = json_encode($results);
 
@@ -115,10 +116,10 @@
             try {
 
                 // 
-                $acknowledgement = new Acknowledgement($pdo);
+                $followship = new Followship($pdo);
             
                 // insert a stock into the stocks table
-                $id = $acknowledgement->deleteAcknowledgement($request);
+                $id = $followship->deleteFollowship($request);
 
                 echo 'The record ' . $id . ' has been deleted';
             

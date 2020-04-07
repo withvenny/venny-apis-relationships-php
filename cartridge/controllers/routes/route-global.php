@@ -24,8 +24,8 @@
             switch ($_REQUEST['domain']) {
 
                 //
-                case 'acknowledgements': require 'controllers/resources/resource-reactions-acknowledgements.php'; break;
-                case 'comments': require 'controllers/resources/resource-reactions-comments.php'; break;
+                case 'followships': require 'controllers/resources/resource-relationships-followships.php'; break;
+                case 'groups': require 'controllers/resources/resource-relationships-groups.php'; break;
     
                 //
                 default: header("Location: template-guest-hello.php");
