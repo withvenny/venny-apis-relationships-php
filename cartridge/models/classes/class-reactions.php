@@ -577,7 +577,7 @@
         public function insertComment($request) {
 
             //generate ID
-            if(!isset($request['id'])){$request['id'] = $this->token->new_id('ack');}
+            if(!isset($request['id'])){$request['id'] = $this->token->new_id('com');}
 
             $columns = "";
 
