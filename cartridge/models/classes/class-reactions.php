@@ -729,7 +729,7 @@
                     if(isset($request['text'])){$refinements.="comment_text"." ILIKE "."'%".$request['text']."%' AND ";}
                     if(isset($request['thread'])){$refinements.="comment_thread"." = "."'".$request['thread']."' AND ";}
                     if(isset($request['object'])){$refinements.="comment_object"." = "."'".$request['object']."' AND ";}
-                    if(isset($request['profile'])){$refinements.="profile_id"." = "."'".$request['profile']."' AND ";}
+                    //if(isset($request['profile'])){$refinements.="profile_id"." = "."'".$request['profile']."' AND ";}
 
                     //echo $conditions . 'conditions1<br/>';
                     //echo $refinements . 'refinements1<br/>';
@@ -750,7 +750,7 @@
                     //echo $conditions . 'conditions2<br/>';
                     //echo $refinements . 'refinements2<br/>';
 
-                    //echo $sql; exit;
+                    echo $sql; exit;
                     
                     //
                     $statement = $this->pdo->prepare($sql);
