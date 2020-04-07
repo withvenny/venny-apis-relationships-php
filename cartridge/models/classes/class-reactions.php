@@ -848,9 +848,10 @@
 
             // UPDATE OBJECT - SET
             // SKIP as ID won't be getting UPDATED
-            if(isset($request['attributes'])){$set.= " acknowledgement_attributes = :acknowledgement_attributes ";}
-            if(isset($request['type'])){$set.= " acknowledgement_type = :acknowledgement_type ";}
-            if(isset($request['object'])){$set.= " acknowledgement_object = :acknowledgement_object ";}
+            if(isset($request['attributes'])){$set.= " comment_attributes = :comment_attributes ";}
+            if(isset($request['text'])){$set.= " comment_text = :comment_text ";}
+            if(isset($request['thread'])){$set.= " comment_thread = :comment_thread ";}
+            if(isset($request['object'])){$set.= " comment_object = :comment_object ";}
 
             //
             $set = str_replace('  ',',',$set);
@@ -870,11 +871,12 @@
             $statement = $this->pdo->prepare($sql);
     
             // UPDATE OBJECT - BIND VALUES
-            // SKIP as ID won't be getting UPDATED
-            if(isset($request['attributes'])){$set.= " comment_attributes = :comment_attributes ";}
-            if(isset($request['text'])){$set.= " comment_text = :comment_text ";}
-            //if(isset($request['thread'])){$set.= " comment_thread = :comment_thread ";}
-            //if(isset($request['object'])){$set.= " comment_object = :comment_object ";}
+            //if(isset($request['id'])){$statement->bindValue(':comment_id', $request['id']);}
+            if(isset($request['attributes'])){$statement->bindValue(':comment_attributes', $request['attributes']);}
+            if(isset($request['text'])){$statement->bindValue(':comment_text', $request['text']);}
+            if(isset($request['thread'])){$statement->bindValue(':comment_thread', $request['thread']);}
+            if(isset($request['object'])){$statement->bindValue(':comment_object', $request['object']);}
+            //if(isset($request['profile_id'])){$statement->bindValue(':profile_id', $request['profile_id']);}
 
             $statement->bindValue(':id', $id);
 
