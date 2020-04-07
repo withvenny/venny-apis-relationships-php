@@ -19,14 +19,10 @@
     // INITIATE DATA CLEANSE
     if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}
     if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}
-    if(isset($_REQUEST['body'])){$request['body'] = clean($_REQUEST['body']);}
-    if(isset($_REQUEST['images'])){$request['images'] = clean($_REQUEST['images']);}
-    if(isset($_REQUEST['closed'])){$request['closed'] = clean($_REQUEST['closed']);}
-    if(isset($_REQUEST['deleted'])){$request['deleted'] = clean($_REQUEST['deleted']);}
-    if(isset($_REQUEST['access'])){$request['access'] = clean($_REQUEST['access']);}
-    if(isset($_REQUEST['host'])){$request['host'] = clean($_REQUEST['host']);}
+    if(isset($_REQUEST['type'])){$request['type'] = clean($_REQUEST['type']);}
+    if(isset($_REQUEST['object'])){$request['object'] = clean($_REQUEST['object']);}
     if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
-
+    
     //
     switch ($_SERVER['REQUEST_METHOD']) {
 
@@ -36,14 +32,14 @@
             try {
 
                 // 
-                $post = new Post($pdo);
+                $acknowledgment = new Acknowledgment($pdo);
             
                 // insert a stock into the stocks table
-                $id = $post->insertPost($request);
+                $id = $acknowledgment->insertAcknowledgment($request);
 
                 $request['id'] = $id;
 
-                $results = $post->selectPosts($request);
+                $results = $acknowledgment->selectAcknowledgments($request);
 
                 $results = json_encode($results);
                 
@@ -69,10 +65,10 @@
             try {
 
                 // 
-                $post = new Post($pdo);
+                $acknowledgment = new Acknowledgment($pdo);
 
                 // get all stocks data
-                $results = $post->selectPosts($request);
+                $results = $acknowledgment->selectAcknowledgments($request);
 
                 $results = json_encode($results);
 
@@ -92,14 +88,14 @@
             try {
 
                 // 
-                $post = new Post($pdo);
+                $acknowledgment = new Acknowledgment($pdo);
             
                 // insert a stock into the stocks table
-                $id = $post->updatePost($request);
+                $id = $acknowledgment->updateAcknowledgment($request);
 
                 $request['id'] = $id;
 
-                $results = $post->selectPosts($request);
+                $results = $acknowledgment->selectAcknowledgments($request);
 
                 $results = json_encode($results);
 
@@ -119,10 +115,10 @@
             try {
 
                 // 
-                $post = new Post($pdo);
+                $acknowledgment = new Acknowledgment($pdo);
             
                 // insert a stock into the stocks table
-                $id = $post->deletePost($request);
+                $id = $acknowledgment->deleteAcknowledgment($request);
 
                 echo 'The record ' . $id . ' has been deleted';
             

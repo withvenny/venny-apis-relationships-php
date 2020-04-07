@@ -1,2 +1,2 @@
-# venny-api-posts
-The Official Venny Labs Posts API.
+# venny-api-reactions
+The Official Venny Labs Reactions API.
