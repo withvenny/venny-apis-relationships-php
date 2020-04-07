@@ -583,5 +583,356 @@
         }
 
     }
+
+    //
+    class Tag {
+
+        //
+        private $pdo;
+    
+        //
+        public function __construct($pdo) {
+
+            //
+            $this->pdo = $pdo;
+
+            //
+            $this->token = new \Posts\Token($this->pdo);
+
+        }
+
+        //
+        public function insertTag($request) {
+
+            //generate ID
+            if(!isset($request['id'])){$request['id'] = $this->token->new_id('tag');}
+
+            $columns = "";
+
+            // INSERT OBJECT - COLUMNS
+            if(isset($request['id'])){$columns.="tag_id,";}
+            if(isset($request['attributes'])){$columns.="tag_attributes,";}
+            if(isset($request['label'])){$columns.="tag_label,";}
+            if(isset($request['object'])){$columns.="tag_object,";}
+            if(isset($request['profile'])){$columns.="profile,";}
+
+            $columns.= "app_id,";
+            $columns.= "event_id,";
+            $columns.= "process_id";
+
+            $values = "";
+
+            // INSERT OBJECT - VALUES
+            if(isset($request['id'])){$values.=":tag_id,";}
+            if(isset($request['attributes'])){$values.=":tag_attributes,";}
+            if(isset($request['label'])){$values.=":tag_label,";}
+            if(isset($request['object'])){$values.=":tag_object,";}
+            if(isset($request['profile'])){$values.=":profile_id,";}
+
+            $values.= ":app_id,";
+            $values.= ":event_id,";
+            $values.= ":process_id";
+
+            // prepare statement for insert
+            $sql = "INSERT INTO {$request['domain']} (";
+            $sql.= $columns;
+            $sql.= ") VALUES (";
+            $sql.= $values;
+            $sql.= ")";
+            $sql.= " RETURNING " . prefixed($request['domain']) . "_id";
+
+            //echo $sql;
+    
+            //
+            $statement = $this->pdo->prepare($sql);
+            
+            // INSERT OBJECT - BIND VALUES
+            if(isset($request['id'])){$statement->bindValue('tag_id',$request['id']);}
+            if(isset($request['attributes'])){$statement->bindValue('tag_attributes',$request['attributes']);}
+            if(isset($request['label'])){$statement->bindValue('tag_label',$request['label']);}
+            if(isset($request['object'])){$statement->bindValue('tag_object',$request['object']);}
+            if(isset($request['profile'])){$statement->bindValue('profile_id',$request['profile']);}
+
+            $statement->bindValue(':app_id', $request['app']);
+            $statement->bindValue(':event_id', $this->token->event_id());
+            $statement->bindValue(':process_id', $this->token->process_id());
+            
+            // execute the insert statement
+            $statement->execute();
+
+            $data = $statement->fetchAll();
+            
+            $data = $data[0]['tag_id'];
+
+            return $data;
+        
+        }
+
+        //
+        public function selectTags($request) {
+
+            //echo json_encode($request); exit;
+
+            //$token = new \Core\Token($this->pdo);
+            $token = $this->token->validatedToken($request['token']);
+
+            // Retrieve data ONLY if token  
+            if($token) {
+                
+                // domain, app always present
+                if(!isset($request['per'])){$request['per']=20;}
+                if(!isset($request['page'])){$request['page']=1;}
+                if(!isset($request['limit'])){$request['limit']=100;}
+
+                //
+                $conditions = "";
+                $domain = $request['domain'];
+                $prefix = prefixed($domain);
+
+                // SELECT OBJECT - COLUMNS
+                $columns = "
+
+                tag_ID,
+                tag_attributes,
+                tag_label,
+                tag_object,
+                profile_ID,
+                app_ID
+
+                ";
+
+                $table = $domain;
+
+                //
+                $start = 0;
+
+                //
+                if(isset($request['page'])) {
+
+                    //
+                    $start = ($request['page'] - 1) * $request['per'];
+                
+                }
+
+                //
+                if(!empty($request['id'])) {
+
+                    $conditions.= ' WHERE ';
+                    $conditions.= ' ' . $prefix . '_id = :id ';
+                    $conditions.= ' AND active = 1 ';
+                    $conditions.= ' ORDER BY time_finished DESC ';
+
+                    $subset = " LIMIT 1";
+
+                    $sql = "SELECT ";
+                    $sql.= $columns;
+                    $sql.= " FROM " . $table;
+                    $sql.= $conditions;
+                    $sql.= $subset;
+                    
+                    //echo json_encode($request['id']);
+                    //echo '<br/>';
+                    //echo $sql; exit;
+
+                    //
+                    $statement = $this->pdo->prepare($sql);
+
+                    // bind value to the :id parameter
+                    $statement->bindValue(':id', $request['id']);
+
+                    //echo $sql; exit;
+
+                } else {
+
+                    $conditions = "";
+                    $refinements = "";
+
+                    // SELECT OBJECT - WHERE CLAUSES
+                    // SKIP ID
+                    if(isset($request['attributes'])){$refinements.="tag_attributes"." ILIKE "."'%".$request['attributes']."%' AND ";}
+                    if(isset($request['label'])){$refinements.="tag_label"." ILIKE "."'%".$request['label']."%' AND ";}
+                    if(isset($request['object'])){$refinements.="tag_object"." = "."'".$request['object']."' AND ";}
+                    if(isset($request['profile'])){$refinements.="profile_id"." = "."'".$request['profile']."' AND ";}
+
+                    //echo $conditions . 'conditions1<br/>';
+                    //echo $refinements . 'refinements1<br/>';
+                    
+                    $conditions.= " WHERE ";
+                    $conditions.= $refinements;
+                    $conditions.= " active = 1 ";
+                    $conditions.= ' AND app_id = \'' . $request['app'] . '\' ';
+                    $conditions.= ' AND profile_id = \'' . $request['profile'] . '\' ';
+                    $conditions.= " ORDER BY time_finished DESC ";
+                    $subset = " OFFSET {$start}" . " LIMIT {$request['per']}";
+                    $sql = "SELECT ";
+                    $sql.= $columns;
+                    $sql.= "FROM " . $table;
+                    $sql.= $conditions;
+                    $sql.= $subset;
+
+                    //echo $conditions . 'conditions2<br/>';
+                    //echo $refinements . 'refinements2<br/>';
+
+                    //echo $sql; exit;
+                    
+                    //
+                    $statement = $this->pdo->prepare($sql);
+
+                }
+                    
+                // execute the statement
+                $statement->execute();
+
+                //
+                $results = [];
+                $total = $statement->rowCount();
+                $pages = ceil($total/$request['per']); //
+                //$current = 1; // current page
+                //$limit = $result['limit'];
+                //$max = $result['max'];
+
+                //
+                if($statement->rowCount() > 0) {
+
+                    //
+                    $data = array();
+                
+                    //
+                    while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        
+                        //
+                        $data[] = [
+
+                            'id' => $row['tag_id'],
+                            'attributes' => json_decode($row['tag_attributes']),
+                            'label' => $row['tag_label'],
+                            'object' => $row['tag_object'],
+                            'profile' => $row['profile_id'],
+                            'app' => $row['app_id']
+
+                        ];
+
+                    }
+
+                    $code = 200;
+                    $message = "OK";
+
+                } else {
+
+                    //
+                    $data = NULL;
+                    $code = 204;
+                    $message = "No Content";
+
+                }
+
+            } else {
+
+                //
+                $data[] = NULL;
+                $code = 401;
+                $message = "Forbidden - Valid token required";
+
+            }
+
+            $results = array(
+
+                'status' => $code,
+                'message' => $message,
+                'metadata' => [
+                    'page' => $request['page'],
+                    'pages' => $pages,
+                    'total' => $total
+                ],
+                'data' => $data,
+                'log' => [
+                    'process' => $process_id = $this->token->process_id(),
+                    'event' => $event_id = $this->token->event_id($process_id)
+                ]
+
+            );
+
+            //
+            return $results;
+
+        }
+
+        //
+        public function updateTag($request) {
+
+            //
+            $domain = $request['domain'];
+            $table = prefixed($domain);
+            $id = $request['id'];
+
+            //
+            $set = "";
+
+            // UPDATE OBJECT - SET
+            // SKIP as ID won't be getting UPDATED
+            if(isset($request['attributes'])){$set.= " tag_attributes = :tag_attributes ";}
+            if(isset($request['label'])){$set.= " tag_label = :tag_label ";}
+            if(isset($request['object'])){$set.= " tag_object = :tag_object ";}
+
+            //
+            $set = str_replace('  ',',',$set);
+
+            // GET table name
+            $condition = $table."_id = :id";
+            $condition.= " RETURNING " . $table . "_id";
+
+            // sql statement to update a row in the stock table
+            $sql = "UPDATE {$domain} SET ";
+            $sql.= $set;
+            $sql.= " WHERE ";
+            $sql.= $condition;
+
+            //echo $sql; exit;
+
+            $statement = $this->pdo->prepare($sql);
+    
+            // UPDATE OBJECT - BIND VALUES
+            //if(isset($request['id'])){$statement->bindValue(':tag_id', $request['id']);}
+            if(isset($request['attributes'])){$statement->bindValue(':tag_attributes', $request['attributes']);}
+            if(isset($request['label'])){$statement->bindValue(':tag_label', $request['label']);}
+            if(isset($request['object'])){$statement->bindValue(':tag_object', $request['object']);}
+            if(isset($request['profile'])){$statement->bindValue(':profile_id', $request['profile']);}
+            if(isset($request['app'])){$statement->bindValue(':app_id', $request['app']);}
+
+            $statement->bindValue(':id', $id);
+
+            // update data in the database
+            $statement->execute();
+
+            $data = $statement->fetchAll();
+            
+            $data = $data[0]['tag_id'];
+
+            // return generated id
+            return $data;
+
+        }
+
+        //
+        public function deleteTag($request) {
+
+            $id = $request['id'];
+            $domain = $request['domain'];
+            $column = prefixed($domain) . '_id';
+            $sql = 'DELETE FROM ' . $domain . ' WHERE '.$column.' = :id';
+            //echo $id; //exit
+            //echo $column; //exit;
+            //echo $domain; //exit;
+            //echo $sql; //exit
+
+            $statement = $this->pdo->prepare($sql);
+            //$statement->bindParam(':column', $column);
+            $statement->bindValue(':id', $id);
+            $statement->execute();
+            return $statement->rowCount();
+
+        }
+
+    }
     
 ?>
