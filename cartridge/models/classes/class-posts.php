@@ -271,7 +271,7 @@
             $sql.= ")";
             $sql.= " RETURNING " . prefixed($request['domain']) . "_id";
 
-            echo $sql;
+            //echo $sql;
     
             //
             $statement = $this->pdo->prepare($sql);

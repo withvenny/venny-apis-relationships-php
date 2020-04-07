@@ -65,7 +65,7 @@
 
         //$data = NULL;
         $code = 401;
-        $message = "Forbidden - Valid token required - what token you ask?" . var_dump($_REQUEST);
+        $message = "Forbidden - Valid token required - what token you ask?";
 
         $results = array(
             'status' => $code,
