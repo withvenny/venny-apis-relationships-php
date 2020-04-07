@@ -20,6 +20,7 @@
     if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}		
     if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}		
     if(isset($_REQUEST['label'])){$request['label'] = clean($_REQUEST['label']);}		
+    if(isset($_REQUEST['object'])){$request['object'] = clean($_REQUEST['object']);}		
     if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
     //
     switch ($_SERVER['REQUEST_METHOD']) {
