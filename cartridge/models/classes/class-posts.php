@@ -232,15 +232,15 @@
             $columns = "";
 
             // INSERT OBJECT - COLUMNS
-            if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}
-            if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}
-            if(isset($_REQUEST['body'])){$request['body'] = clean($_REQUEST['body']);}
-            if(isset($_REQUEST['images'])){$request['images'] = clean($_REQUEST['images']);}
-            if(isset($_REQUEST['closed'])){$request['closed'] = clean($_REQUEST['closed']);}
-            if(isset($_REQUEST['deleted'])){$request['deleted'] = clean($_REQUEST['deleted']);}
-            if(isset($_REQUEST['access'])){$request['access'] = clean($_REQUEST['access']);}
-            if(isset($_REQUEST['host'])){$request['host'] = clean($_REQUEST['host']);}
-            if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
+            if(isset($request['id'])){$columns.="post_id,";}	
+            if(isset($request['attributes'])){$columns.="post_attributes,";}	
+            if(isset($request['body'])){$columns.="post_body,";}	
+            if(isset($request['images'])){$columns.="post_images,";}	
+            if(isset($request['closed'])){$columns.="post_closed,";}	
+            if(isset($request['deleted'])){$columns.="post_deleted,";}	
+            if(isset($request['access'])){$columns.="post_access,";}	
+            if(isset($request['host'])){$columns.="post_host,";}
+            if(isset($request['profile'])){$columns.="profile_id,";}
 
             $columns.= "app_id,";
             $columns.= "event_id,";
