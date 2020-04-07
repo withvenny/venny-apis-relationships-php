@@ -270,6 +270,8 @@
             $sql.= $values;
             $sql.= ")";
             $sql.= " RETURNING " . prefixed($request['domain']) . "_id";
+
+            echo $sql;
     
             //
             $statement = $this->pdo->prepare($sql);
