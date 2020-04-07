@@ -24,8 +24,10 @@
             switch ($_REQUEST['domain']) {
 
                 //
-                case 'threads': require 'controllers/resources/resource-messaging-threads.php'; break;
-                case 'messages': require 'controllers/resources/resource-messaging-messages.php'; break;
+                case 'threads': require 'controllers/resources/resource-posts-posts.php'; break;
+                case 'threads': require 'controllers/resources/resource-posts-tags.php'; break;
+                case 'threads': require 'controllers/resources/resource-posts-topics.php'; break;
+                case 'threads': require 'controllers/resources/resource-posts-trends.php'; break;
     
                 //
                 default: header("Location: template-guest-hello.php");

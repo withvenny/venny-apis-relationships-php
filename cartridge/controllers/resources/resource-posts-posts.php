@@ -4,9 +4,9 @@
     header('Content-Type: application/json');
 
     //
-    use Messaging\Connection as Connection;
-    use Messaging\Token as Token;
-    use Messaging\Thread as Thread;
+    use Posts\Connection as Connection;
+    use Posts\Token as Token;
+    use Posts\Post as Post;
 
     // connect to the PostgreSQL database
     $pdo = Connection::get()->connect();
@@ -17,12 +17,13 @@
     if(isset($_REQUEST['token'])){$request['token'] = clean($_REQUEST['token']);}
 
     // INITIATE DATA CLEANSE
-    if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}
-    if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}
-    if(isset($_REQUEST['title'])){$request['title'] = clean($_REQUEST['title']);}
-    if(isset($_REQUEST['participants'])){$request['participants'] = clean($_REQUEST['participants']);}
-    if(isset($_REQUEST['preview'])){$request['preview'] = clean($_REQUEST['preview']);}
-    if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}   
+    if(isset($_REQUEST['id'])){$request['id'] = clean($_REQUEST['id']);}		
+    if(isset($_REQUEST['attributes'])){$request['attributes'] = clean($_REQUEST['attributes']);}		
+    if(isset($_REQUEST['body'])){$request['body'] = clean($_REQUEST['body']);}		
+    if(isset($_REQUEST['images'])){$request['images'] = clean($_REQUEST['images']);}		
+    if(isset($_REQUEST['deleted'])){$request['deleted'] = clean($_REQUEST['deleted']);}
+    if(isset($_REQUEST['thread'])){$request['thread'] = clean($_REQUEST['thread']);}
+    if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
 
     //
     switch ($_SERVER['REQUEST_METHOD']) {
@@ -33,14 +34,14 @@
             try {
 
                 // 
-                $thread = new Thread($pdo);
+                $message = new Message($pdo);
             
                 // insert a stock into the stocks table
-                $id = $thread->insertThread($request);
+                $id = $message->insertMessage($request);
 
                 $request['id'] = $id;
 
-                $results = $thread->selectThreads($request);
+                $results = $message->selectMessages($request);
 
                 $results = json_encode($results);
                 
@@ -66,10 +67,10 @@
             try {
 
                 // 
-                $thread = new Thread($pdo);
+                $message = new Message($pdo);
 
                 // get all stocks data
-                $results = $thread->selectThreads($request);
+                $results = $message->selectMessages($request);
 
                 $results = json_encode($results);
 
@@ -89,14 +90,14 @@
             try {
 
                 // 
-                $thread = new Thread($pdo);
+                $message = new Message($pdo);
             
                 // insert a stock into the stocks table
-                $id = $thread->updateThread($request);
+                $id = $message->updateMessage($request);
 
                 $request['id'] = $id;
 
-                $results = $thread->selectThreads($request);
+                $results = $message->selectMessages($request);
 
                 $results = json_encode($results);
 
@@ -116,10 +117,10 @@
             try {
 
                 // 
-                $thread = new Thread($pdo);
+                $message = new Message($pdo);
             
                 // insert a stock into the stocks table
-                $id = $thread->deleteThread($request);
+                $id = $message->deleteMessage($request);
 
                 echo 'The record ' . $id . ' has been deleted';
             

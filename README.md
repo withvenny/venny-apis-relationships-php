@@ -1,2 +1,2 @@
-# venny-api-messaging
-The Official Venny Labs Messaging API.
+# venny-api-posts
+The Official Venny Labs Posts API.
