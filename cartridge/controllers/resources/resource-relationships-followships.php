@@ -22,7 +22,7 @@
     if(isset($_REQUEST['recipient'])){$request['recipient'] = clean($_REQUEST['recipient']);}
     if(isset($_REQUEST['sender'])){$request['sender'] = clean($_REQUEST['sender']);}
     if(isset($_REQUEST['status'])){$request['status'] = clean($_REQUEST['status']);}
-    if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile_']);}
+    if(isset($_REQUEST['profile'])){$request['profile'] = clean($_REQUEST['profile']);}
 
     //
     switch ($_SERVER['REQUEST_METHOD']) {
